@@ -1,0 +1,135 @@
+<aura:component controller="ExchangeRateController" description="ExchangeRate"
+                implements="flexipage:availableForAllPageTypes" access="global">
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <aura:attribute name="startDate" type="Date"/>
+    <aura:attribute name="endDate" type="Date"/>
+    <aura:attribute name="historicalDate" type="Date"/>
+    <aura:attribute name="todayDate" type="Date"/>
+    <aura:attribute name="rates" type="Map"/>
+    <aura:attribute name="another" type="Map"/>
+    <aura:attribute name="currencies" type="Exchange_Rate__c[]"/>
+    <aura:attribute name="base" type="Exchange_Rate__c"/>
+    <aura:attribute name="selectBase" type="Exchange_Rate__c"/>
+    <aura:attribute name="anotherBaseCurrency" type="Exchange_Rate__c" default="false"/>
+    <aura:attribute name="options" type="List" default="[
+    {'label': 'Date', 'value': 'option1'},
+    {'label': 'Period', 'value': 'option2'}
+    ]"/>
+    <aura:attribute name="radioDatePeriod" type="String"/>
+    <aura:attribute name="radioByDate" type="String"/>
+    <aura:attribute name="period" type="String"/>
+
+    <aura:attribute name="data" type="Exchange_Rate__c[]"/>
+    <aura:attribute name="columns" type="List"/>
+
+
+    <lightning:card footer="Exchange Rate" title="Exchange Rate">
+        <div class="slds-align_absolute-center">
+            <img src="{!$Resource.money}" width="100" height="100"/>
+        </div>
+
+        <p class="slds-p-horizontal_large">
+
+            <lightning:select label="Currency" name="a_opt" aura:id="a_opt" onchange="{!c.changeAction}">
+                <aura:iteration items="{!v.currencies}" var="cur">
+                    <option value="{!cur}">{!cur}</option>
+                </aura:iteration>
+            </lightning:select>
+
+            <lightning:radioGroup name="radioGroup"
+                                  label="Choose Your Option "
+                                  options="{! v.options }"
+                                  value="{! v.radioDatePeriod }"
+                                  type="radio"
+                                  aura:id="radioGrp"
+                                  onchange="{!c.handleSelect}"/>
+
+
+            <aura:if isTrue="{!(v.period)}">
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                    <div class="slds-size_1-of-2">
+                        <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                            <lightning:input type="date" name="startDate" label="Start Date: "
+                                             aura:id="startDate" value="{!v.startDate}"
+                                             onchange="{!c.changeStartDate}"/>
+                        </div>
+                    </div>
+                    <div class="slds-size_1-of-2">
+                        <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                            <lightning:input type="date" name="endDate" label="End Date: "
+                                             aura:id="endDate" value="{!v.endDate}" onchange="{!c.changeEndDate}"/>
+                        </div>
+                    </div>
+                </div>
+                <table class="slds-table ">
+                    <thead>
+                    <tr>
+                        <aura:iteration items="{!v.columns}" var="col">
+                            <th scope="col"><span class="slds-truncate">"{!col}"</span></th>
+                        </aura:iteration>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <aura:iteration items="{!v.data}" var="rate">
+                        <tr>
+                            <aura:iteration items="{!rate}" var="val">
+                                <td>{!val}</td>
+                            </aura:iteration>
+                        </tr>
+                    </aura:iteration>
+                    </tbody>
+                </table>
+            </aura:if>
+
+
+            <aura:if isTrue="{!(v.radioByDate)}">
+                <div class="demo-only demo-only--sizing slds-grid slds-wrap">
+                    <div class="slds-box slds-box_x-small slds-text-align_center slds-m-around_x-small">
+                        <lightning:input type="date" name="startDate" label="Date: " max="{!v.todayDate}"
+                                         aura:id="startDate" value="{!v.historicalDate}"
+                                         onchange="{!c.changeHistoricalDate}"/>
+                    </div>
+                </div>
+            </aura:if>
+        </p>
+
+
+        <aura:if isTrue="{!(!v.anotherBaseCurrency)}">
+            <div class="slds-form">
+                <aura:iteration items="{!v.rates}" var="item">
+                    <div class="slds-form-element slds-form-element_horizontal">
+                        <div class="slds-m-left_xx-large">
+                            <label class="slds-form-element__label slds-text-heading_medium"
+                                   for="horizontal-input-id-01">{!item.key}</label>
+                        </div>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="horizontal-input-id-01" value="{!item.value}" readonly="true"
+                                   class="slds-input slds-form-element_readonly"/>
+                        </div>
+                    </div>
+                </aura:iteration>
+            </div>
+        </aura:if>
+
+
+        <aura:if isTrue="{!v.anotherBaseCurrency}">
+            <div class="slds-form">
+                <aura:iteration items="{!v.another}" var="item1">
+                    <div class="slds-form-element slds-form-element_horizontal">
+                        <div class="slds-m-left_xx-large">
+                            <label class="slds-form-element__label slds-text-heading_medium"
+                                   for="horizontal-input-id-01">{!item1.key}</label>
+                        </div>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="horizontal-input-id-01" value="{!item1.value}" readonly="true"
+                                   class="slds-input slds-form-element_readonly"/>
+                        </div>
+                    </div>
+                </aura:iteration>
+            </div>
+        </aura:if>
+
+    </lightning:card>
+</aura:component>
